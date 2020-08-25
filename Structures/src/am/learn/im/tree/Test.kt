@@ -1,14 +1,21 @@
 package am.learn.im.tree
 
+import am.learn.im.support.checkRuntimeSpeedOf
 import am.learn.im.tree.Tree.Companion.treeOf
 
 fun main() {
-    val tree = treeOf((0..50).toList())
 
-    tree.dump()
+    checkRuntimeSpeedOf("constructing tree"){
+        val tree = treeOf((0..50000).toList())
 
-    println(55 in tree)
-    println(5 in tree)
-    println(555 in tree)
+//    tree.dump()
+
+        println(55 in tree)
+        println(5 in tree)
+        println(555 in tree)
+
+        println(tree.height)
+    }
+
 
 }

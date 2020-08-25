@@ -8,5 +8,5 @@ fun checkRuntimeSpeedOf(functionName: String, timeUnit: TimeUnit = TimeUnit.MILL
     val start = System.nanoTime()
     function()
     val end = System.nanoTime()
-    println("To execute ($functionName) we have spent [${timeUnit.convert(Duration.ofNanos(end - start))}] ${timeUnit.name}")
+    println("During ($functionName) we have spent [${timeUnit.convert(Duration.ofNanos(end - start))}] ${timeUnit.name}")
 }

@@ -6,17 +6,18 @@ import java.util.concurrent.TimeUnit
 
 fun main() {
 
-    checkRuntimeSpeedOf("CUSTOM MAP") {
+    checkRuntimeSpeedOf("constructing custom map") {
         var key = ""
+        var value = 0
         val cm = mapOf<String, Int>().apply {
             (0..200000).map {
-                key = "K" + (Math.random())
-                val value = (Math.random()).toInt()
+                key = "K" + (0..200000).random()
+                value = (0..200000).random()
                 this[key] = value
             }
         }
-        checkRuntimeSpeedOf("CONTAINS ${key}", TimeUnit.NANOSECONDS){
-            println(key in cm)
+        checkRuntimeSpeedOf("checking if contains the key [${key}]", TimeUnit.NANOSECONDS){
+            println("Value of ${key} is ${cm[key]} was put $value")
         }
     }
 
@@ -24,17 +25,18 @@ fun main() {
     println("--------------------------------------------")
     println("--------------------------------------------")
 
-    checkRuntimeSpeedOf("DEFAULT MAP") {
+    checkRuntimeSpeedOf("constructing default kotlin map") {
         var key = ""
+        var value = 0
         val dm = mutableMapOf<String, Int>().apply {
             (0..200000).map {
-                key = "K" + (Math.random())
-                val value = (Math.random()).toInt()
+                key = "K" + (0..200000).random()
+                value = (0..200000).random()
                 this[key] = value
             }
         }
-        checkRuntimeSpeedOf("CONTAINS ${key}", TimeUnit.NANOSECONDS){
-            println(key in dm)
+        checkRuntimeSpeedOf("checking if contains the key [${key}]", TimeUnit.NANOSECONDS){
+            println("Value of ${key} is ${dm[key]} was put $value")
         }
     }
 

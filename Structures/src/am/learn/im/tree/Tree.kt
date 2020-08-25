@@ -5,6 +5,8 @@ class Tree <T: Comparable<T>> {
 
     private var root: Node<T>? = null
 
+    val height get() = heightOf(root) - 1
+
     fun insert(value: T) {
         root = insert(root, Node(value))
     }
@@ -13,39 +15,45 @@ class Tree <T: Comparable<T>> {
         return contains(root, value)
     }
 
-    fun delete(value: Int) {
-        TODO("When nerever budet vparyadke")
-    }
-
     private fun insert(node: Node<T>?, newNode: Node<T>): Node<T> {
         when {
             node == null -> return newNode
-            node.value < newNode.value -> {
-                node.left = insert(node.left, newNode)
-            }
-            node.value > newNode.value -> {
-                node.right = insert(node.right, newNode)
-            }
-            else -> {
-                node.value = newNode.value
-            }
+            node.value < newNode.value -> node.left = insert(node.left, newNode)
+            node.value > newNode.value -> node.right = insert(node.right, newNode)
+            else -> node.value = newNode.value
         }
         return node.balance()
     }
 
     private fun contains(node: Node<T>?, value: T): Boolean{
-        if(node == null){
-            return false
-        }
         return when {
+            node == null -> false
             node.value < value -> contains(node.left, value)
             node.value > value -> contains(node.right, value)
             else -> true
         }
     }
 
+    private fun heightOf(node: Node<T>?): Int {
+        return when {
+            node == null -> 0
+            node.left != null -> 1 + heightOf(node.left)
+            node.right != null -> 1 + heightOf(node.right)
+            else -> 1
+        }
+    }
+
     fun dump(){
         Printer.printNode(root)
+    }
+
+    fun delete(value: Int) {
+        TODO("When nerever budet vparyadke")
+        // find node
+        // if has no child - remove
+        // if has 1 child - replace child with node
+        // if has 2 child - get lower of right replace with node
+        // done
     }
 
     companion object {
