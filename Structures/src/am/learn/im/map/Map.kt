@@ -4,13 +4,13 @@ import kotlin.math.abs
 
 data class Entry<K: Any, V: Any>(var key: K, var value: V)
 
-class CustomMap<K: Any, V : Any> {
+class Map<K: Any, V : Any> {
 
     val uid = Math.random()
 
     var map: Array<Entry<K, V>?>  = arrayOfNulls(DEFAULT_SIZE)
 
-    private var collisions: CustomMap<K, V>? = null
+    private var collisions: Map<K, V>? = null
 
     private var size = 0
 
@@ -51,7 +51,7 @@ class CustomMap<K: Any, V : Any> {
 
     private fun setCollision(key: K, value: V): Boolean {
         if(collisions == null){
-            collisions = CustomMap()
+            collisions = Map()
         }
         return collisions!!.set(key, value)
     }
@@ -111,8 +111,8 @@ class CustomMap<K: Any, V : Any> {
         const val LOAD_FACTOR = 0.75
         const val EXTENSIBILITY_FACTOR = 2.5
 
-        fun <K: Any, V: Any> customMapOf(pairs: List<Pair<K, V>> = listOf()): CustomMap<K, V> {
-            return CustomMap<K, V>().apply {
+        fun <K: Any, V: Any> mapOf(pairs: List<Pair<K, V>> = listOf()): Map<K, V> {
+            return Map<K, V>().apply {
                 pairs.forEach {(key, value) ->
                     this[key] = value
                 }

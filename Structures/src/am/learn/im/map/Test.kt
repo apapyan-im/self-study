@@ -1,6 +1,6 @@
 package am.learn.im.map
 
-import am.learn.im.map.CustomMap.Companion.customMapOf
+import am.learn.im.map.Map.Companion.mapOf
 import am.learn.im.support.checkRuntimeSpeedOf
 import java.util.concurrent.TimeUnit
 
@@ -8,7 +8,7 @@ fun main() {
 
     checkRuntimeSpeedOf("CUSTOM MAP") {
         var key = ""
-        val cm = customMapOf<String, Int>().apply {
+        val cm = mapOf<String, Int>().apply {
             (0..200000).map {
                 key = "K" + (Math.random())
                 val value = (Math.random()).toInt()
