@@ -16,27 +16,19 @@ fun main() {
         }
     }
 
-    val from = vertices.random()
-    val to = vertices.random()
-
-    println("\n------------------------------------------------")
-    print("BFSING...")
-    vertices.random().breadthFirstSearch {
-        print("$name -> ")
-    }
-    println("\n------------------------------------------------")
-    print("DFSING...")
-    vertices.random().depthFirstSearch {
-        print("$name -> ")
-    }
-    println("\n------------------------------------------------")
     runCatching {
-        println("Shortest path from ${from.name} to ${to.name} is " + from.shortestPath(to))
+        val first = vertices.random()
+        val second = vertices.random()
+        println("Shortest path from ${first.name} to ${second.name} is " + first.shortestPath2(second))
     }.onFailure {
-        println("Path from ${from.name} to ${to.name} is not found")
+        if(it is PathIsNotFoundException){
+            println("${it.message}")
+        }
+        else throw it
     }
     println("------------------------------------------------")
-    from.dump().forEach { t, u ->
-        println("${t.name} $u")
-    }
+//    from.dump().forEach { t, u ->
+//        println("${t.name} $u")
+//    }
+
 }

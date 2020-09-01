@@ -15,23 +15,22 @@ class Node<T: Comparable<T>> (var value: T) {
     private fun rotateRight(): Node<T> {
         val node = left
         left = node!!.right
-        fixHeight()
         node.right = this
-        node.fixHeight()
         node.parent = parent
+        fixHeight()
+        node.fixHeight()
         return node
     }
 
     private fun rotateLeft(): Node<T> {
         val node = right
         right = node!!.left
-        fixHeight()
         node.left = this
-        node.fixHeight()
         node.parent = parent
+        fixHeight()
+        node.fixHeight()
         return node
     }
-
 
     private fun fixHeight() {
         height = 1 + (left?.height ?: 0) + (right?.height ?: 0)
@@ -40,17 +39,13 @@ class Node<T: Comparable<T>> (var value: T) {
     fun balance(): Node<T> {
         fixHeight()
         if (balanceFactor > 1) {
-            left?.let {
-                if (it.balanceFactor < 0) {
-                    left = it.rotateLeft()
-                }
+            if (left!!.balanceFactor < 0) {
+                left = left!!.rotateLeft()
             }
             return rotateRight()
         } else if (balanceFactor < -1) {
-            right?.let {
-                if (it.balanceFactor > 0) {
-                    right = it.rotateRight()
-                }
+            if (right!!.balanceFactor > 0) {
+                right = right!!.rotateRight()
             }
             return rotateLeft()
         }

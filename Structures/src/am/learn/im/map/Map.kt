@@ -33,20 +33,17 @@ class Map<K: Any, V : Any> {
         }
         val position: Int = positionOf(key)
         val entry = map[position]
-        when {
+        return when {
             entry == null -> {
-                map[position] = Entry(key, value)
-                size++
-                return true
+                map[position] = Entry(key, value).also {  size++ }; true
             }
             entry.key == key -> {
-                entry.value  = value
+                entry.value  = value; false
             }
             else -> {
                 return setCollision(key, value)
             }
         }
-        return false
     }
 
     private fun setCollision(key: K, value: V): Boolean {
@@ -94,7 +91,22 @@ class Map<K: Any, V : Any> {
         return get(key) != null
     }
 
-    private fun positionOf(key: K) = abs(key.hashCode()) % map.size
+    private fun positionOf(key: K): Int {
+        val index = abs(key.hashCode()) % map.size
+        var newIndex = index
+        var entry = map[index]
+        for (i in index until map.size){
+            entry = map[i]
+            if(entry?.key != key){
+                newIndex = i; break
+            }
+        }
+        return if(entry?.key != key) {
+            index
+        }else{
+            newIndex
+        }
+    }
 
     private fun resize() {
         val old = map
@@ -107,8 +119,8 @@ class Map<K: Any, V : Any> {
     }
 
     companion object {
-        const val DEFAULT_SIZE = 100
-        const val LOAD_FACTOR = 0.75
+        const val DEFAULT_SIZE = 150
+        const val LOAD_FACTOR = 0.8
         const val EXTENSIBILITY_FACTOR = 2.5
 
         fun <K: Any, V: Any> mapOf(pairs: List<Pair<K, V>> = listOf()): Map<K, V> {

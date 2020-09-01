@@ -43,15 +43,19 @@ fun String.has(substring: String): Boolean {
     val prefix = IntArray(full.length)
     var p = 0
     for (i in 1 until full.length){
-        while(true){
-            if(full[p] == full[i]){  ++p; break  }
-            if(p == 0){ break }
-            p = prefix[p - 1]
-        }
         if(substring.length == p){
             return true
         }
-        prefix[i] = p
+        while(true){
+            if(full[p] == full[i]){
+                ++p; break
+            }
+            if(p == 0){
+                break
+            }
+            p = prefix[p]
+        }
+        prefix[i - 1] = p
     }
     return false
 }
