@@ -12,7 +12,7 @@ fun fibonacciOf(n: Int): Long {
 }
 
 // s = "" || s1 == "" -> ""
-// s.last = s1.last -> 1 + s.last + f(s - 1, s1 - 1)
+// s.last = s1.last -> s.last + f(s - 1, s1 - 1)
 // if len s > s1 -> f(s - 1, s1) else -> f(s, s1 - 1)
 fun String.longestCommonSubsequence(string: String): String {
     val f = Array(this.length + 1) {
@@ -64,8 +64,6 @@ data class BackpackItem(val weight: Int, val value: Int, val id: Double = Math.r
     override fun toString(): String = "[V(${value}) W(${weight})]"
 }
 
-
-// ~ f(l, w) = value + max(f([l - 1], w - w1, f([l - 1], w - w1) 2^n
 fun maxBackpackValue(items: List<BackpackItem>, maxWeight: Int): List<BackpackItem> {
     val f = Array(maxWeight + 1) {
         IntArray(items.size + 1)

@@ -1,33 +1,18 @@
 package com.learn.im.graphs
 
-import java.lang.Exception
 import java.lang.RuntimeException
 
 
-enum class State{
-    VISITED,
-    NOT_VISITED
-}
-
-class Vertex(val name: String) {
+class Vertex(val label: String): Visitable<Vertex>() {
     val edges = mutableSetOf<Edge>()
     var previous: Vertex? = null
     var distance = Int.MAX_VALUE
 
-    private var state: State = State.NOT_VISITED
+    operator fun contains(edge: Edge) = edges.contains(edge)
 
-    fun connect(vararg edges: Edge) = this.also {
+    fun addEdge(vararg edges: Edge) = this.also {
         this.edges.addAll(edges.map(this::verifyEdge))
     }
-
-    fun isConnectedWith(edge: Edge) = edges.contains(edge)
-
-    fun ifNotVisited(execute: (Vertex) -> Unit){
-        if(state == State.NOT_VISITED) execute(this)
-    }
-
-    fun visit() = this.also { state = State.VISITED }
-    fun leave() = this.also { state = State.NOT_VISITED }
 
     fun resetDistance(){
         distance = Int.MAX_VALUE
@@ -36,31 +21,43 @@ class Vertex(val name: String) {
 
     private fun verifyEdge(edge: Edge):Edge{
         assert(edge.weight >= 0) {
-            "Unsupported edge $name -> ${edge.destination.name} with invalid value ${edge.weight}"
+            "Unsupported edge $label -> ${edge.destination.label} with invalid 'negative' value ${edge.weight}"
         }
         return edge
     }
 
-    override fun toString(): String {
-        return name
-    }
+    override fun toString() = label
 }
 
 data class Edge(var destination: Vertex, var weight: Int = 1){
-    override fun toString(): String {
-        return "(${destination.name})"
-    }
 
-    override fun equals(other: Any?): Boolean {
-        if(other !is Edge) return false
-        return destination == other.destination
-    }
+    override fun equals(other: Any?)
+            = if(other !is Edge)  false else destination == other.destination
 
-    override fun hashCode(): Int {
-        var result = destination.hashCode()
-        result = 31 * result + weight
-        return result
-    }
+    override fun hashCode() =  31 * destination.hashCode() + weight
+
+    override fun toString() = "(${destination.label})"
 }
 
-class PathIsNotFoundException(from: Vertex, to: Vertex): RuntimeException("Path from ${from.name} to ${to.name} is not found")
+enum class State{
+    VISITED,
+    NOT_VISITED
+}
+
+abstract class Visitable<T: Visitable<T>>{
+    private var state: State  = State.NOT_VISITED
+
+    fun ifNotVisited(execute: (T) -> Unit){
+        if(state == State.NOT_VISITED) execute(get())
+    }
+    fun ifVisited(execute: (T) -> Unit){
+        if(state != State.NOT_VISITED) execute(get())
+    }
+
+    fun visit() = get().also { state = State.VISITED }
+    fun leave() = get().also { state = State.NOT_VISITED }
+
+    private fun get() = this as T;
+}
+
+class PathIsNotFoundException(from: Vertex, to: Vertex): RuntimeException("Path from ${from.label} to ${to.label} is not found")

@@ -11,15 +11,15 @@ fun main() {
 
     edges.forEach { edge ->
         val current = vertices.random()
-        if(!current.isConnectedWith(edge)) {
-            current.connect(edge)
+        if(edge !in current) {
+            current.addEdge(edge)
         }
     }
 
     runCatching {
         val first = vertices.random()
         val second = vertices.random()
-        println("Shortest path from ${first.name} to ${second.name} is " + first.shortestPath2(second))
+        println("Shortest path from ${first.label} to ${second.label} is " + first.shortestPath2(second))
     }.onFailure {
         if(it is PathIsNotFoundException){
             println("${it.message}")
