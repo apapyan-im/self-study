@@ -2,41 +2,42 @@ package com.learn.im.graphs
 
 import java.lang.RuntimeException
 
+interface Vertex<T: Vertex<T>>: Visitable<T> {
 
-class Vertex(val label: String): Visitable<Vertex>() {
-    val edges = mutableSetOf<Edge>()
-    var previous: Vertex? = null
+    val label: String
+
+    val edges: MutableSet<Edge<T>>
+
+    fun addEdge(vararg edges: Edge<T>) = this.edges.addAll(edges)
+
+    fun removeEdge(vararg edges: Edge<T>) = this.edges.removeAll(edges)
+
+    operator fun contains(edge: Edge<T>) = this.edges.contains(edge)
+}
+
+data class Edge<T: Vertex<T>>(var destination: T, var weight: Int = 1)
+
+class DijkstraVertex(override val label: String, override val edges: MutableSet<Edge<DijkstraVertex>> = mutableSetOf()): Vertex<DijkstraVertex> {
+
+    override var state: State = State.NOT_VISITED
+
+    var previous: DijkstraVertex? = null
     var distance = Int.MAX_VALUE
-
-    operator fun contains(edge: Edge) = edges.contains(edge)
-
-    fun addEdge(vararg edges: Edge) = this.also {
-        this.edges.addAll(edges.map(this::verifyEdge))
-    }
 
     fun resetDistance(){
         distance = Int.MAX_VALUE
         previous = null
     }
 
-    private fun verifyEdge(edge: Edge):Edge{
+    private fun verifyEdge(edge: Edge<DijkstraVertex>) = edge.also {
         assert(edge.weight >= 0) {
             "Unsupported edge $label -> ${edge.destination.label} with invalid 'negative' value ${edge.weight}"
         }
-        return edge
     }
 
+    override fun addEdge(vararg edges: Edge<DijkstraVertex>) = this.edges.addAll(edges.map(this::verifyEdge))
+
     override fun toString() = label
-}
-
-data class Edge(var destination: Vertex, var weight: Int = 1){
-
-    override fun equals(other: Any?)
-            = if(other !is Edge)  false else destination == other.destination
-
-    override fun hashCode() =  31 * destination.hashCode() + weight
-
-    override fun toString() = "(${destination.label})"
 }
 
 enum class State{
@@ -44,8 +45,8 @@ enum class State{
     NOT_VISITED
 }
 
-abstract class Visitable<T: Visitable<T>>{
-    private var state: State  = State.NOT_VISITED
+interface Visitable<T: Visitable<T>>{
+    var state: State
 
     fun ifNotVisited(execute: (T) -> Unit){
         if(state == State.NOT_VISITED) execute(get())
@@ -54,10 +55,10 @@ abstract class Visitable<T: Visitable<T>>{
         if(state != State.NOT_VISITED) execute(get())
     }
 
-    fun visit() = get().also { state = State.VISITED }
-    fun leave() = get().also { state = State.NOT_VISITED }
+    fun visit() { state = State.VISITED }
+    fun leave() { state = State.NOT_VISITED }
 
     private fun get() = this as T;
 }
 
-class PathIsNotFoundException(from: Vertex, to: Vertex): RuntimeException("Path from ${from.label} to ${to.label} is not found")
+class PathIsNotFoundException(from: Vertex<*>, to: Vertex<*>): RuntimeException("Path from ${from.label} to ${to.label} is not found")

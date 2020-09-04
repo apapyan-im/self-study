@@ -6,7 +6,7 @@ fun main() {
     val countOfVertices = 50
     val countOfEdges = (countOfVertices * 5)
 
-    val vertices = (1..countOfVertices).map { Vertex("V${it}") }
+    val vertices = (1..countOfVertices).map { DijkstraVertex("V${it}") }
     val edges = (1..countOfEdges).map { Edge(vertices.random()/*, (0..1000).random()*/) }
 
     edges.forEach { edge ->

@@ -3,27 +3,27 @@ package com.learn.im.graphs
 import java.util.*
 
 
-fun Vertex.shortestPath2(end: Vertex): List<Vertex> {
+fun DijkstraVertex.shortestPath2(vertex: DijkstraVertex): List<DijkstraVertex> {
     distance = 0
-
     fixDistances4(this)
+
 
     breadthFirstSearch {
         fixDistances4(it)
     }
 
-    if(end.previous == null && end != this){
-        throw PathIsNotFoundException(this, end)
+    if(vertex.previous == null && vertex != this){
+        throw PathIsNotFoundException(this, vertex)
     }
 
-    return end.go2StartCollecting().also {
+    return vertex.go2StartCollecting().also {
         depthFirstSearch {
             it.resetDistance()
         }
     }
 }
 
-private fun fixDistances4(vertex: Vertex){
+private fun fixDistances4(vertex: DijkstraVertex){
     vertex.edges.forEach { edge ->
         val next = edge.destination
         val distance = vertex.distance + edge.weight
@@ -34,24 +34,23 @@ private fun fixDistances4(vertex: Vertex){
     }
 }
 
-private fun Vertex?.go2StartCollecting():List<Vertex>{
-    val passedVertices = mutableListOf<Vertex>()
+private fun DijkstraVertex?.go2StartCollecting():List<DijkstraVertex>{
+    val alreadyGenerated = mutableListOf<DijkstraVertex>()
     return if(this != null) {
-        previous.go2StartCollecting() + passedVertices.also {
+        previous.go2StartCollecting() + alreadyGenerated.also {
             it.add(this)
         }
-    } else passedVertices
+    } else alreadyGenerated
 }
 
-
-fun Vertex.depthFirstSearch(handle: (Vertex) -> Unit){
-    val handled = mutableListOf<Vertex>()
-    fun dfsInternal(start: Vertex){
+fun <T : Vertex<T>> T.depthFirstSearch(handle: (T) -> Unit){
+    val handled = mutableListOf<T>()
+    fun dfsInternal(start: T){
         start.edges.forEach { edge ->
             edge.destination.ifNotVisited {
-                handled.add(it.apply {
-                    handle(visit())
-                })
+                it.visit()
+                handle(it)
+                handled.add(it)
                 dfsInternal(it)
             }
         }
@@ -60,18 +59,17 @@ fun Vertex.depthFirstSearch(handle: (Vertex) -> Unit){
     handled.forEach { it.leave() }
 }
 
-fun Vertex.breadthFirstSearch(handle: (Vertex) -> Unit){
-    val handled = mutableListOf<Vertex>()
-    val queue: Queue<Vertex> = LinkedList()
-    queue.add(this)
-    while (!queue.isEmpty()) {
-        val current = queue.poll()
-        handled.add(current)
+fun  <T : Vertex<T>> T.breadthFirstSearch(handle: (T) -> Unit){
+    val handled = mutableListOf<T>()
+    val toBeHandled: Queue<T> = LinkedList()
+    toBeHandled.add(this)
+    while (!toBeHandled.isEmpty()) {
+        val current = toBeHandled.poll()
         current.edges.forEach { edge ->
             edge.destination.ifNotVisited{
-                queue.add(it.apply {
-                    handle(visit())
-                })
+                it.visit()
+                handle(it)
+                toBeHandled.add(it)
             }
         }
     }
@@ -79,9 +77,9 @@ fun Vertex.breadthFirstSearch(handle: (Vertex) -> Unit){
 }
 
 //debug
-fun Vertex.dump(): MutableMap<Vertex, MutableSet<Edge>> {
-    val map = mutableMapOf<Vertex, MutableSet<Edge>>()
-    fun constructMatrix(from: Vertex){
+fun Vertex<*>.dump(): MutableMap<Vertex<*>, Set<Edge<*>>> {
+    val map = mutableMapOf<Vertex<*>, Set<Edge<*>>>()
+    fun constructMatrix(from: Vertex<*>){
         map[from] = from.edges
         for (edge in from.edges){
             if (edge.destination !in map){
