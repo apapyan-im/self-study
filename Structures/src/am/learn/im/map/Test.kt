@@ -45,7 +45,7 @@ fun main() {
         }
     }
     checkRuntimeSpeedOf("checking if contains the key [${key}]", TimeUnit.NANOSECONDS){
-        println("Value of $key is ${defaultMap[key]} was put $value")
+        key in defaultMap
     }
     checkRuntimeSpeedOf("checking if not contains the key [${notExistentKey}]", TimeUnit.NANOSECONDS){
         notExistentKey in defaultMap

@@ -22,7 +22,3 @@ fun String.Companion.generate(length: Int, case: Case = Case.UPPER): String {
 }
 
 val String.Companion.empty get() = ""
-
-fun range(from: Int, to: Int, step: Int = 1): IntProgression {
-    return (from until to step step)
-}
