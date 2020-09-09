@@ -5,45 +5,36 @@ class Tree <T: Comparable<T>> {
 
     private var root: Node<T>? = null
 
-    val height get() = heightOf(root)
+    val height get() = height(root)
+
+    private fun height(node: Node<T>?):Int = when (node) {
+        null -> 0
+        else -> maxOf(height(node.left), height(node.right)) + 1
+    }
 
     fun insert(value: T) {
+        fun insert(node: Node<T>?, newNode: Node<T>): Node<T> {
+            when {
+                node == null -> return newNode
+                node.value < newNode.value -> node.left = insert(node.left, newNode)
+                node.value > newNode.value -> node.right = insert(node.right, newNode)
+                else -> node.value = newNode.value
+            }
+            return node.balance()
+        }
+
         root = insert(root, Node(value))
     }
 
     operator fun contains(value: T): Boolean {
-        return contains(root, value)
-    }
-
-    private fun insert(node: Node<T>?, newNode: Node<T>): Node<T> {
-        when {
-            node == null -> return newNode
-            node.value < newNode.value -> node.left = insert(node.left, newNode)
-            node.value > newNode.value -> node.right = insert(node.right, newNode)
-            else -> node.value = newNode.value
-        }
-        return node.balance()
-    }
-
-    private fun contains(node: Node<T>?, value: T): Boolean = when {
+        fun contains(node: Node<T>?, value: T): Boolean = when {
             node == null -> false
             node.value < value -> contains(node.left, value)
             node.value > value -> contains(node.right, value)
             else -> true
         }
 
-
-    private fun heightOf(node: Node<T>?): Int {
-        fun heightInternal(node: Node<T>?): Int {
-            return when {
-                node == null -> 0
-                node.left != null -> 1 + heightOf(node.left)
-                node.right != null -> 1 + heightOf(node.right)
-                else -> 1
-            }
-        }
-
-        return maxOf(heightInternal(node?.left), heightInternal(node?.right)) + 1
+        return contains(root, value)
     }
 
     fun dump() = Printer.printNode(root)

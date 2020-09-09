@@ -27,8 +27,11 @@ fun main() {
         else throw it
     }
     println("------------------------------------------------")
-//    from.dump().forEach { t, u ->
-//        println("${t.name} $u")
-//    }
+    vertices.random().dump().forEach { t, u ->
+        println("${t.label} $u")
+    }
 
+
+
+    println(Int.MAX_VALUE + -200)
 }

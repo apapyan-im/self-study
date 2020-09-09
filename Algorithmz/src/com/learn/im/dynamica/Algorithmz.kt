@@ -1,6 +1,5 @@
 package com.learn.im.dynamica
 
-// f(0) = 1 , f(1) = 1, f(n) = f(n - 1) + f(n - 2)
 fun fibonacciOf(n: Int): Long {
     val f = LongArray(n + 1)
     f[0] = 0
@@ -11,9 +10,6 @@ fun fibonacciOf(n: Int): Long {
     return f.last()
 }
 
-// s = "" || s1 == "" -> ""
-// s.last = s1.last -> s.last + f(s - 1, s1 - 1)
-// if len s > s1 -> f(s - 1, s1) else -> f(s, s1 - 1)
 fun String.longestCommonSubsequence(string: String): String {
     val f = Array(this.length + 1) {
         IntArray(string.length + 1) { 0 }
@@ -24,7 +20,7 @@ fun String.longestCommonSubsequence(string: String): String {
                 f[i][j] = 1 + f[i - 1][j - 1]
             }
             else{
-                f[i][j] = f[i - 1][j].coerceAtLeast(f[i][j - 1])
+                f[i][j] = maxOf(f[i - 1][j], f[i][j - 1])
             }
         }
     }
@@ -40,22 +36,20 @@ fun String.longestCommonSubsequence(string: String): String {
 fun String.has(substring: String): Boolean {
     if(substring.length > this.length) return false
     val full = "${substring}&${this}"
-    val prefix = IntArray(full.length)
-    var p = 0
-    for (i in 1 until full.length){
-        if(substring.length == p){
+    val prefixes = IntArray(full.length)
+    var prefix = 0
+    for (i in 1 until full.length) {
+        if(substring.length == prefix){
             return true
         }
-        while(true){
-            if(full[p] == full[i]){
-                ++p; break
-            }
-            if(p == 0){
-                break
-            }
-            p = prefix[p]
+        while (prefix > 0 && full[prefix] != full[i]) {
+            prefix = prefixes[prefix]
         }
-        prefix[i - 1] = p
+
+        if (full[prefix] == full[i]) {
+            prefix++
+        }
+        prefixes[i-1] = prefix
     }
     return false
 }
@@ -73,12 +67,10 @@ fun maxBackpackValue(items: List<BackpackItem>, maxWeight: Int): List<BackpackIt
         val value = items[i - 1].value
 
         for (j in 1 until weight) {
-            if(j < maxWeight){
-                f[j][i] = f[j][i - 1]
-            }
+            if(j < maxWeight) f[j][i] = f[j][i - 1]
         }
         for (j in weight..maxWeight){
-            f[j][i] = f[j][i - 1].coerceAtLeast(value + f[j - weight][i - 1])
+            f[j][i] = maxOf(f[j][i - 1], value + f[j - weight][i - 1])
         }
     }
 

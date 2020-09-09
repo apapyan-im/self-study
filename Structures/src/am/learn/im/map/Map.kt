@@ -6,8 +6,6 @@ data class Entry<K : Any, V : Any>(var key: K, var value: V)
 
 class Map<K : Any, V : Any> {
 
-    val uid = Math.random()
-
     var map: Array<Entry<K, V>?> = arrayOfNulls(DEFAULT_SIZE)
 
     private var collisions: Map<K, V>? = null
@@ -24,39 +22,45 @@ class Map<K : Any, V : Any> {
             it?.key
         } + (collisions?.keys ?: listOf())
 
-    fun size(): Int = size + (collisions?.size() ?: 0)
-
-    fun arraySize(): Int = map.size + (collisions?.arraySize() ?: 0)
+    fun size(): Int = size + (collisions?.size ?: 0)
 
     private val nextLoadFactor: Double
         get() = ((size + 1) / map.size).toDouble()
 
     operator fun set(key: K, value: V): Boolean {
+        return set(Entry(key, value), hashOf(key))
+    }
+
+    private fun hashOf(key: K) = abs(key.hashCode())
+
+    private fun set(newEntry: Entry<K, V>, hash: Int): Boolean {
         if (nextLoadFactor > LOAD_FACTOR) resize()
-        val position: Int = positionOf(key)
+        val position = positionOf(newEntry.key, hash)
         val entry = map[position]
         return when {
             entry == null -> {
-                map[position] = Entry(key, value).also { size++ }; true
+                map[position] = newEntry.also {
+                    size++
+                }; true
             }
-            entry.key == key -> {
-                entry.value = value; false
+            entry.key == newEntry.key -> {
+                entry.value = newEntry.value; false
             }
             else -> {
-                settleCollision(key, value)
+                settleCollision(newEntry, hash)
             }
         }
     }
 
-    private fun settleCollision(key: K, value: V): Boolean {
+    private fun settleCollision(entry: Entry<K, V>, hash: Int): Boolean {
         if (collisions == null) {
             collisions = Map()
         }
-        return collisions!!.set(key, value)
+        return collisions!!.set(entry, hash)
     }
 
     operator fun get(key: K): V? {
-        val position = positionOf(key)
+        val position = positionOf(key, hashOf(key))
         val entry = map[position]
         return when {
             entry == null -> null
@@ -65,13 +69,15 @@ class Map<K : Any, V : Any> {
         }
     }
 
-    fun delete(key: K): V? {
-        val position = positionOf(key)
+    fun remove(key: K): V? {
+        val position = positionOf(key, hashOf(key))
         val entry = map[position]
         return when {
             entry == null -> null
-            entry.key == key -> entry.value.also { map[position] = null }
-            else -> collisions?.delete(key)
+            entry.key == key -> entry.value.also {
+                map[position] = null
+            }
+            else -> collisions?.remove(key)
         }
     }
 
@@ -79,10 +85,10 @@ class Map<K : Any, V : Any> {
         return get(key) != null
     }
 
-    private fun positionOf(key: K): Int {
-        val index = abs(key.hashCode()) % map.size
+    private fun positionOf(key: K, hash: Int): Int {
+        val index = hash % map.size
         var newIndex = index
-        var entry: Entry<K, V>? = map[index] ?: return index
+        var entry: Entry<K, V>? = map[index]
         for (i in index until map.size) {
             entry = map[i]
             if (entry?.key != key) {

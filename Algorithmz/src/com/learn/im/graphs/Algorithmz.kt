@@ -4,7 +4,9 @@ import java.util.*
 
 
 fun DijkstraVertex.shortestPath2(vertex: DijkstraVertex): List<DijkstraVertex> {
+
     distance = 0
+
     fixDistances4(this)
 
 
@@ -45,17 +47,17 @@ private fun DijkstraVertex?.go2StartCollecting():List<DijkstraVertex>{
 
 fun <T : Vertex<T>> T.depthFirstSearch(handle: (T) -> Unit){
     val handled = mutableListOf<T>()
-    fun dfsInternal(start: T){
+    fun dfs(start: T){
         start.edges.forEach { edge ->
             edge.destination.ifNotVisited {
                 it.visit()
                 handle(it)
                 handled.add(it)
-                dfsInternal(it)
+                dfs(it)
             }
         }
     }
-    dfsInternal(this)
+    dfs(this)
     handled.forEach { it.leave() }
 }
 
