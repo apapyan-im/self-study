@@ -100,18 +100,20 @@ class Map<K : Any, V : Any> {
 
     private fun resize() {
         val old = map
-        map = arrayOfNulls<Entry<K, V>?>((old.size * EXTENSIBILITY_FACTOR).toInt()).also { size = 0 }
+        map = arrayOfNulls<Entry<K, V>?>((this.map.size * EXTENSIBILITY_FACTOR).toInt()).also { size = 0 }
+        var entry:Entry<K, V>?
         for (i in old.indices) {
-            if (map[i] != null) {
-                map[i] = old[i]
+            entry = old[i]
+            if (entry != null) {
+                set(entry.key, entry.value)
             }
         }
     }
 
     companion object {
-        const val DEFAULT_SIZE = 10
-        const val LOAD_FACTOR = 0.77
-        const val EXTENSIBILITY_FACTOR = 1.2
+        const val DEFAULT_SIZE = 1000
+        const val LOAD_FACTOR = 0.8
+        const val EXTENSIBILITY_FACTOR = 2
 
         fun <K : Any, V : Any> mapOf(pairs: List<Pair<K, V>> = listOf()): Map<K, V> {
             return Map<K, V>().apply {
